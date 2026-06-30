@@ -1,0 +1,57 @@
+services:
+  sensor_group_1:
+    build: .
+    container_name: sensor_group_1
+    environment:
+      - ID_SENSOR=1
+      - NUM_VAGA=1
+      - MQTT_BROKER=10.0.0.2
+      - MQTT_PORT=1883
+      - MQTT_TOPIC_PREFIX=estacionamento1
+      - QOS=1
+      - EXPERIMENT=mqtt_baseline_4sensors
+      - MIN_WAIT_SECONDS=30
+      - MAX_WAIT_SECONDS=300
+    network_mode: host
+  sensor_group_2:
+    build: .
+    container_name: sensor_group_2
+    environment:
+      - ID_SENSOR=2
+      - NUM_VAGA=2
+      - MQTT_BROKER=10.0.0.2
+      - MQTT_PORT=1883
+      - MQTT_TOPIC_PREFIX=estacionamento1
+      - QOS=1
+      - EXPERIMENT=mqtt_baseline_4sensors
+      - MIN_WAIT_SECONDS=30
+      - MAX_WAIT_SECONDS=300
+    network_mode: host
+  sensor_group_3:
+    build: .
+    container_name: sensor_group_3
+    environment:
+      - ID_SENSOR=3
+      - NUM_VAGA=3
+      - MQTT_BROKER=10.0.0.2
+      - MQTT_PORT=1883
+      - MQTT_TOPIC_PREFIX=estacionamento1
+      - QOS=1
+      - EXPERIMENT=mqtt_baseline_4sensors
+      - MIN_WAIT_SECONDS=30
+      - MAX_WAIT_SECONDS=300
+    network_mode: host
+  sensor_group_4:
+    build: .
+    container_name: sensor_group_4
+    environment:
+      - ID_SENSOR=4
+      - NUM_VAGA=4
+      - MQTT_BROKER=10.0.0.2
+      - MQTT_PORT=1883
+      - MQTT_TOPIC_PREFIX=estacionamento1
+      - QOS=1
+      - EXPERIMENT=mqtt_baseline_4sensors
+      - MIN_WAIT_SECONDS=30
+      - MAX_WAIT_SECONDS=300
+    network_mode: host
