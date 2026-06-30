@@ -27,7 +27,7 @@ flowchart LR
     subgraph "Local Network (192.168.15.0/24)"
         direction TB
         RPi["Raspberry Pi (192.168.15.45)\nMQTT Broker (Port 1883)"]
-        Processor["Data Processor\n(HTTPS POST)"]
+        Processor["Data Processor (main_broker.py)\n(HTTPS POST)"]
         RPi --> Processor
     end
 
@@ -49,9 +49,19 @@ flowchart LR
 
 * `main.py` / `main_second.py`: The core simulator scripts. They implement the Finite State Machine (FSM) logic for the parking spots, using the `paho-mqtt` library to publish events to the broker.
 * `gerar_compose.py`: A Python utility script that dynamically generates the `docker-compose.yml` file. It allows you to effortlessly scale the simulation to dozens of containers/sensors by simply changing a few variables in the code.
+* `main_broker.py`: The edge data processor. It subscribes to the local Mosquitto broker, calculates network metrics, applies business rules, and bridges the local network to the TagoIO cloud.
 * `Dockerfile`: Defines a lightweight image based on `python:3.11-slim` to encapsulate the application and automatically install required dependencies.
 * `docker-compose.yml`: The generated manifest configuring environment variables (such as `MQTT_BROKER`, `ID_SENSOR`, `NUM_VAGA`) and setting the network to *host mode* for easier VPN routing.
 * `LICENSE`: MIT License terms.
+
+## 🧠 Data Processor & Cloud Bridge (`main_broker.py`)
+
+The `main_broker.py` script acts as the vital middleman between the local IoT network and the TagoIO platform. Its core responsibilities include:
+
+* **MQTT Subscription:** It listens to the wildcard topic (`estacionamento1/#`) to capture all incoming sensor events from the WireGuard tunnel.
+* **Real-time Network Auditing:** It dynamically calculates telemetry and network health metrics, including `latency_ms`, `latency_variation_ms` (jitter), `msg_rate`, `throughput_bps`, and `packet_loss`.
+* **Business Rules Engine:** It maps the incoming `employee_type` to specific parking duration limits (e.g., 60, 240, or 480 minutes).
+* **Cloud Integration:** It packages the raw JSON payloads into TagoIO's native format and pushes the enriched data securely via HTTPS POST using a specific Device Token.
 
 ## ⚙️ MQTT Payload Format
 
@@ -74,7 +84,7 @@ Each sensor publishes a JSON message at every state transition. The payload foll
 
 ### Prerequisites
 * **Docker** and **Docker Compose** installed on your machine.
-* **Python 3.11+** (to run the setup scripts).
+* **Python 3.11+** (to run the setup and broker scripts) and the `paho-mqtt` & `requests` libraries.
 * An active **MQTT Broker** (can be local or accessible via VPN, like the WireGuard setup on IP `10.0.0.2` used in this project).
 
 ### Step-by-Step Guide
@@ -85,19 +95,25 @@ Each sensor publishes a JSON message at every state transition. The payload foll
    cd Distributed-Smart-Parking-with-MQTT-Broker-over-WireGuard-and-TagoIO-Integration
    ```
 
-2. **Configure the Simulation Scale:**
+2. **Start the Data Processor (Broker Bridge):**
+   Run the processor locally (or on your Raspberry Pi) to start listening to the MQTT Broker and forwarding data to TagoIO.
+   ```bash
+   python main_broker.py
+   ```
+
+3. **Configure the Simulation Scale:**
    If you want to change the number of parking spots, edit the `NUM_CONTAINERS` and `SENSORS_PER_CONTAINER` variables inside the `gerar_compose.py` script. Then, generate the new manifest:
    ```bash
    python gerar_compose.py
    ```
 
-3. **Build and Start the Containers:**
-   Run the containers in detached mode:
+4. **Build and Start the Sensor Containers:**
+   Run the simulation containers in detached mode:
    ```bash
    docker-compose up --build -d
    ```
 
-4. **Monitor the Logs:**
+5. **Monitor the Logs:**
    To watch the state transitions (Empty -> Occupied) and MQTT publications in real-time:
    ```bash
    docker-compose logs -f
@@ -128,4 +144,4 @@ This work fulfills the final project requirements for the **Wireless Sensor Netw
 
 ## 📄 License
 
-Distributed under the MIT License. See the [LICENSE](LICENSE) file for more information. (Copyright © 2026 **Dener Kraus**, **Henrique Bueno**, and **Lucas Bueno**).
+Distributed under the MIT License. See the [LICENSE](LICENSE) file for more information. (Copyright © 2026 Dener Kraus, Henrique Bueno de Morais, and Lucas Bueno).
