@@ -132,8 +132,8 @@ If you are running the WireGuard server on an **Ubuntu Server 24 VM** using **Vi
 
 The cloud integration allows for real-time visualization of the parking spots and network auditing. 
 
-> `![Parking Dashboard](docs/imagem_vagas_estacionamento.png)`
-> `![Network Audit - Latency and Throughput](docs/imagem_latencia_throughput.png)`
+> ![Parking Dashboard](docs/imagem_vagas_estacionamento.png)
+> ![Network Audit - Latency and Throughput](docs/imagem_latencia_throughput.png)
 
 ## 🎓 Authors & Acknowledgments
 
